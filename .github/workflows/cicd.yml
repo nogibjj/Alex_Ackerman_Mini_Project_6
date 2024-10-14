@@ -22,7 +22,7 @@ jobs:
         run: make lint
       - name: test
         env: 
-          DATBRICKS_KEY: ${{ secrets.DATABRICKS_KEY }}
+          DATABRICKS_KEY: ${{ secrets.DATABRICKS_KEY }}
           SERVER_HOSTNAME: ${{ secrets.SERVER_HOSTNAME }}
           HTTP_PATH: ${{ secrets.HTTP_PATH }}
         run: make test
