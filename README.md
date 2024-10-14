@@ -2,7 +2,7 @@
 
 ## Alex Ackerman Mini Project 5
 
-# Project: ETL-Queary Pipeline with Databricks
+# Project: ETL-Query Pipeline with Databricks
 
 ## Overview:
 
