@@ -16,6 +16,8 @@ jobs:
           python-version: 3.9
       - name: install packages
         run: make install
+      - name: format
+        run: make format
       - name: lint
         run: make lint
       - name: test
@@ -24,5 +26,4 @@ jobs:
           SERVER_HOSTNAME: ${{ secrets.SERVER_HOSTNAME }}
           HTTP_PATH: ${{ secrets.HTTP_PATH }}
         run: make test
-      - name: format
-        run: make format
+
