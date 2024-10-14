@@ -1,26 +1,81 @@
 """
-Transforms and Loads data into the local SQLite3 database
-Example:
-,general name,count_products,ingred_FPro,avg_FPro_products,avg_distance_root,ingred_normalization_term,semantic_tree_name,semantic_tree_node
+Transforms and Loads data into the databricks database
+
 """
-import sqlite3
+
 import csv
 import os
+from dotenv import load_dotenv
+from databricks import sql
 
-#load the csv file and insert into a new sqlite3 database
-def load(dataset="/workspaces/sqlite-lab/data/GroceryDB_IgFPro.csv"):
-    """"Transforms and Loads data into the local SQLite3 database"""
 
-    #prints the full working directory and path
-    print(os.getcwd())
-    payload = csv.reader(open(dataset, newline=''), delimiter=',')
-    conn = sqlite3.connect('GroceryDB.db')
-    c = conn.cursor()
-    c.execute("DROP TABLE IF EXISTS GroceryDB")
-    c.execute("CREATE TABLE GroceryDB (id,general_name, count_products, ingred_FPro, avg_FPro_products, avg_distance_root, ingred_normalization_term, semantic_tree_name, semantic_tree_node)")
-    #insert
-    c.executemany("INSERT INTO GroceryDB VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)", payload)
-    conn.commit()
-    conn.close()
-    return "GroceryDB.db"
+# load the csv file and insert into a new databricks database
+def load(dataset="data/Spotify_2023.csv"):
+    """Transforms and Loads data into databricks database"""
+    payload = csv.reader(open(dataset, newline="", encoding="UTF-8"), delimiter=",")
+    next(payload)
+    load_dotenv()
+    # print(*payload)
+    with sql.connect(
+        server_hostname=os.getenv("SERVER_HOSTNAME"),
+        http_path=os.getenv("HTTP_PATH"),
+        access_token=os.getenv("DATABRICKS_KEY"),
+    ) as connection:
 
+        with connection.cursor() as cursor:
+
+            # Drop table if exists
+            cursor.execute("DROP TABLE IF EXISTS spotify_top_songs")
+
+            # Create Table
+            cursor.execute(
+                """
+            CREATE TABLE spotify_top_songs (
+                music_id INT,
+                track_name STRING,
+                artist_name STRING,  
+                artist_count INT,
+                released_year INT,
+                released_month INT,
+                released_day INT,
+                in_spotify_playlists INT,
+                in_spotify_charts INT,
+                streams STRING,
+                in_apple_playlists INT,
+                in_apple_charts INT,
+                in_deezer_playlists STRING,
+                in_deezer_charts INT,
+                in_shazam_charts STRING,
+                bpm INT,
+                key STRING,
+                mode STRING,
+                danceability_percent FLOAT,  
+                valence_percent FLOAT,       
+                energy_percent FLOAT,        
+                acousticness_percent FLOAT, 
+                instrumentalness_percent FLOAT, 
+                liveness_percent FLOAT,      
+                speechiness_percent FLOAT   
+            );
+            """
+            )
+
+            cursor.execute("SELECT * FROM spotify_top_songs")
+            result = cursor.fetchall()
+            if not result:
+                string_sql = "INSERT INTO spotify_top_songs VAlUES"
+                for i in payload:
+                    string_sql += "\n" + str(tuple(i)) + ","
+                string_sql = string_sql[:-1] + ";"
+                # print(string_sql)
+
+                cursor.execute(string_sql)
+
+            cursor.close()
+            connection.close()
+
+    return "Load Success"
+
+
+if __name__ == "__main__":
+    load()
