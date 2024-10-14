@@ -1,42 +1,43 @@
-## SQLite Lab
+[![CI](https://github.com/nogibjj/Alex_Ackerman_Mini_Project_6/actions/workflows/cicd.yml/badge.svg)](https://github.com/nogibjj/Alex_Ackerman_Mini_Project_6/actions/workflows/cicd.yml)
 
-![4 17-etl-sqlite-RAW](https://github.com/nogibjj/sqlite-lab/assets/58792/b39b21b4-ccb4-4cc4-b262-7db34492c16d)
+## Alex Ackerman Mini Project 5
 
+# Project: ETL-Queary Pipeline with Databricks
 
+## Overview:
 
-### Lab:
+The goal of this project is to build an Extract, Transform, Load (ETL)-Query pipeline using Databricks. The focus was to expand the query complexity of Mini Project 5 and design complex SQL queries for a MySQL database
 
-* Use an AI Assistant, but use a different one then you used from a previous lab (Anthropic's Claud, Bard, Copilot, CodeWhisperer, Colab AI, etc)
-* ETL-Query:  [E] Extract a dataset from URL, [T] Transform, [L] Load into SQLite Database and [Q] Query
-For the ETL-Query lab:
-* [E] Extract a dataset from a URL like Kaggle or data.gov. JSON or CSV formats tend to work well.
-* [T] Transform the data by cleaning, filtering, enriching, etc to get it ready for analysis.
-* [L] Load the transformed data into a SQLite database table using Python's sqlite3 module.
-* [Q] Write and execute SQL queries on the SQLite database to analyze and retrieve insights from the data.
+## Complex SQL Query:
+This query analyzes song characteristics from the top Spotify songs from 2023 to create a Common Table Expression (CTE) and join it to the original table.
 
-#### Tasks:
+```sql
+WITH songs AS (
+  SELECT artist_name,
+    AVG(bpm) AS avg_bpm,
+    AVG(in_spotify_charts) AS avg_spot_chart_ranking
+    FROM default.spotify_top_songs
+    GROUP BY artist_name 
+)
 
-* Fork this project and get it to run
-* Make the query more useful and not a giant mess that prints to screen
-* Convert the main.py into a command-line tool that lets you run each step independantly
-* Fork this project and do the same thing for a new dataset you choose
-* Make sure your project passes lint/tests and has a built badge
-* Include an architectural diagram showing how the project works
+SELECT * FROM default.spotify_top_songs
+JOIN songs
+ON default.spotify_top_songs.artist_name = songs.artist_name
+ORDER BY songs.avg_spot_chart_ranking DESC;
 
-#### Reflection Questions
+```
+### Query Explanation:
 
-* What challenges did you face when extracting, transforming, and loading the data? How did you overcome them?
-* What insights or new knowledge did you gain from querying the SQLite database?
-* How can SQLite and SQL help make data analysis more efficient? What are the limitations?
-* What AI assistant did you use and how did it compare to others you've tried? What are its strengths and weaknesses?
-* If you could enhance this lab, what would you add or change? What other data would be interesting to load and query?
+- **CTE `song`**: Selects the artist name and calculates the average beats-per-minute (bpm) of their songs as well as their average ranking in the Spotify charts.
+- The query then joins the CTE `song` to spotify_top_songs on the artists name
 
-##### Challenge Exercises
+## Data
 
-* Add more transformations to the data before loading it into SQLite. Ideas: join with another dataset, aggregate by categories, normalize columns.
-* Write a query to find correlated fields in the data. Print the query results nicely formatted.
-* Create a second table in the SQLite database and write a join query with the two tables.
-* Build a simple Flask web app that runs queries on demand and displays results.
-* Containerize the application using Docker so the database and queries can be portable
+The data used for this project came from [RunCHIRON](https://github.com/RunCHIRON/dataset) and contains a csv file of the top Spotify songs from 2023
 
+## References
+
+- [sqlite-lab](https://github.com/nogibjj/sqlite-lab/tree/main)
+
+- [Dataset from RunCHIRON Repo](https://github.com/RunCHIRON/dataset)
 
